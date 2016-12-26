@@ -1,6 +1,8 @@
 var Experiment = {
     container: document.getElementById('container'),
     canvas: document.getElementById('canvas'),
+    n1Field: document.getElementById('input_n1'),
+    n2Field: document.getElementById('input_n2'),
     ctx: undefined,
     mouse: false,
     physics: {
@@ -12,14 +14,14 @@ var Experiment = {
         n2: 1.33,
         lensRadius: 50
     },
-    getContext: function(sizeChanged) {
+    getContext: function (sizeChanged) {
         if (this.ctx === undefined) {
             this.ctx = this.canvas.getContext('2d');
         }
         if (sizeChanged) {
             var w = this.canvas.width,
                 h = this.canvas.height;
-            this.ctx.translate(Math.floor(w/2), Math.floor(h/2));
+            this.ctx.translate(Math.floor(w / 2), Math.floor(h / 2));
         }
         return this.ctx;
     },
@@ -38,102 +40,88 @@ var Experiment = {
         this.getContext(true);
         this.draw();
     },
-    getPoint: function(e) {
+    getPoint: function (e) {
         var canvasOffset = $(this.canvas).offset();
-        /*console.log(canoffset.left + " " + canoffset.top);
-        xc = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(canoffset.left);
-        yc = e.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(canoffset.top) + 1;
-
-        return {
-            x: xc,
-            y: yc
-        };*/
-
         return {
             x: e.pageX - canvasOffset.left - Experiment.canvas.width * 0.5,
             y: e.pageY - canvasOffset.top - Experiment.canvas.height * 0.5
         };
     },
-    setListener: function () {
-        this.canvas.addEventListener('click', function (event) {
-            Experiment.onClick(Experiment.getPoint(event));
-        }, false);
+    onClick: function (e) {
+        Experiment.mouse = true;
+        Experiment.onMouseMove(e);
+        Experiment.mouse = false;
     },
-    onClick: function(x, y) {
-        var ctx = Experiment.getContext();
-        //ctx.restore();
-        var w = this.canvas.width,
-            h = this.canvas.height;
-
-        //console.log(x + " " + y);
-
-        /*if (x < 0) {
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(x, y);
-            ctx.stroke();
-        }*/
-    },
-    onMouseDown: function(e) {
+    onMouseDown: function (e) {
         Experiment.mouse = true;
     },
-    onMouseUp: function(e) {
+    onMouseUp: function (e) {
         Experiment.mouse = false;
-
     },
-    onMouseOut: function(e) {
+    onMouseOut: function (e) {
         //Experiment.mouse = false;
-
     },
-    onMouseMove: function(e) {
+    onMouseMove: function (e) {
         if (!Experiment.mouse) {
             return;
         }
         var ctx = Experiment.getContext();
         var point = Experiment.getPoint(e);
-        console.log(point.x + " " + point.y);
-        if (point.x < 0) {
-            Experiment.physics.ray.x = point.x;
-            Experiment.physics.ray.y = point.y;
-            Experiment.draw();
-        }
+        point.x = point.x > 0 ? 0 : point.x;
+        Experiment.physics.ray.x = point.x;
+        Experiment.physics.ray.y = point.y;
+        Experiment.draw();
     },
     draw: function () {
         var ctx = Experiment.getContext();
         var w = this.canvas.width,
             h = this.canvas.height;
-        ctx.clearRect(-w/2, -h/2, w, h);
+        ctx.clearRect(-w / 2, -h / 2, w, h);
 
-        function getLens(midX, midY, radius) {
-            var lens = new Path2D();
-            lens.moveTo(midX, midY + radius);
-            lens.arc(midX, midY, radius, -Math.PI / 2, Math.PI / 2);
-            return lens;
-        }
+        ctx.setLineDash([5, 3]); /*dashes are 5px and spaces are 3px*/
+        ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+        ctx.beginPath();
+        ctx.moveTo(-w / 2, 0);
+        ctx.lineTo(w / 2, 0);
+        ctx.moveTo(0, -h / 2);
+        ctx.lineTo(0, h / 2);
+        ctx.stroke();
+        ctx.setLineDash([0, 0]);
 
-        ctx.fillStyle = "rgb(200,0,0)";
-        ctx.fillRect(10, 10, 50, 50);
+        // Get lens path
+        var lens = new Path2D();
+        lens.moveTo(0, 0 + Experiment.physics.lensRadius);
+        lens.arc(0, 0, Experiment.physics.lensRadius, -Math.PI / 2, Math.PI / 2);
 
-        ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-        ctx.fillRect(30, 30, 50, 50);
+        // Draw lens
+        ctx.fillStyle = "rgba(0, 0, 200, 0.3)";
+        ctx.strokeStyle = "rgba(0, 0, 0, 1.0)";
+        ctx.fill(lens);
+        ctx.stroke(lens);
 
-        ctx.stroke(getLens(0, 0, Experiment.physics.lensRadius));
-        
-        
+
         ctx.lineWidth = 1;
+
+        // Draw main ray
+        ctx.strokeStyle = "rgba(100, 0, 0, 1.0)";
         ctx.beginPath();
         ctx.moveTo(Experiment.physics.ray.x, Experiment.physics.ray.y);
         ctx.lineTo(0, 0);
-        ctx.lineTo(Experiment.physics.ray.x, -Experiment.physics.ray.y);
         ctx.stroke();
 
-        
+        // Draw reflected ray
+        ctx.strokeStyle = "rgba(0, 0, 100, 1.0)";
+        ctx.beginPath();
+        ctx.moveTo(Experiment.physics.ray.x, -Experiment.physics.ray.y);
+        ctx.lineTo(0, 0);
+        ctx.stroke();
+
+        ctx.strokeStyle = "rgba(0, 0, 0, 1.0)";
         var rayLength = Math.sqrt(Math.pow(Experiment.physics.ray.x, 2) + Math.pow(Experiment.physics.ray.y, 2));
 
-        var sinFi2 = (Experiment.physics.n1/Experiment.physics.n2) * (Math.abs(Experiment.physics.ray.y)/rayLength);
-        var newRayLength = Math.min(rayLength, w/2 - 30);
-        var newY = newRayLength * sinFi2;
+        var sinFi2 = (Experiment.physics.n1 / Experiment.physics.n2) * (Math.abs(Experiment.physics.ray.y) / rayLength);
+        var newRayLength = Math.min(rayLength, w / 2 - 30);
+        var newY = newRayLength * sinFi2 * (Experiment.physics.ray.y < 0 ? 1 : -1);
         var newX = Math.sqrt(Math.pow(newRayLength, 2) - Math.pow(newY, 2));
 
         ctx.beginPath();
@@ -143,13 +131,12 @@ var Experiment = {
     }
 };
 
-window.onresize = function () {
+/*window.onresize = function () {
     Experiment.setWidth("auto");
-};
+};*/
 
-$(document).ready(function() {
+$(document).ready(function () {
     Experiment.setWidth("auto");
-    Experiment.setListener();
 });
 
 
@@ -170,4 +157,21 @@ $(Experiment.canvas).mouseup(function (e) {
 $(Experiment.canvas).mouseout(function (e) {
     e.preventDefault();
     Experiment.onMouseOut(e);
+});
+$(Experiment.canvas).click(function (e) {
+    e.preventDefault();
+    Experiment.onClick(e);
+});
+
+
+$(Experiment.n1Field).on('input', function (e) {
+    var value = $(this).val();
+    Experiment.physics.n1 = parseFloat(value);
+    Experiment.draw();
+});
+
+$(Experiment.n2Field).on('input', function (e) {
+    var value = $(this).val();
+    Experiment.physics.n2 = parseFloat(value);
+    Experiment.draw();
 });
