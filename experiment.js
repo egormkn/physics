@@ -4,7 +4,8 @@ var Experiment = {
     n1Field: document.getElementById('input_n1'),
     n2Field: document.getElementById('input_n2'),
     ctx: undefined,
-    mouse: false,
+    moveRay: false,
+    moveStart: false,
     physics: {
         ray: {
             x: -100,
@@ -12,7 +13,8 @@ var Experiment = {
         },
         n1: 1,
         n2: 1.33,
-        lensRadius: 50
+        lensRadius: 50,
+        delta: 1.0
     },
     getContext: function (sizeChanged) {
         if (this.ctx === undefined) {
@@ -48,21 +50,56 @@ var Experiment = {
         };
     },
     onClick: function (e) {
-        Experiment.mouse = true;
+        /*var point = Experiment.getPoint(e);
+        if (Math.abs(point.x) < 5 && Math.abs(point.y - Experiment.physics.lensRadius * Experiment.physics.delta) < 5) {
+            return;
+        }
+        Experiment.moveRay = true;
         Experiment.onMouseMove(e);
-        Experiment.mouse = false;
+        Experiment.moveRay = false;*/
     },
     onMouseDown: function (e) {
-        Experiment.mouse = true;
+        var point = Experiment.getPoint(e);
+        if (Math.abs(point.x) < 5 && Math.abs(point.y - Experiment.physics.lensRadius * Experiment.physics.delta) < 5) {
+            Experiment.moveStart = true;
+            Experiment.canvas.style.cursor = "s-resize";
+        } else {
+            if (point.x > 0) {
+                return;
+            }
+            Experiment.moveRay = true;
+            Experiment.canvas.style.cursor = "crosshair";
+        }
+        Experiment.onMouseMove(e);
     },
     onMouseUp: function (e) {
-        Experiment.mouse = false;
+        Experiment.moveRay = false;
+        Experiment.moveStart = false;
+        Experiment.canvas.style.cursor = "default";
     },
     onMouseOut: function (e) {
-        //Experiment.mouse = false;
+        Experiment.moveRay = false;
+        Experiment.moveStart = false;
+        Experiment.canvas.style.cursor = "default";
     },
     onMouseMove: function (e) {
-        if (!Experiment.mouse) {
+        if (!Experiment.moveRay) {
+            var point = Experiment.getPoint(e);
+            if (Experiment.moveStart) {
+                var d = point.y / Experiment.physics.lensRadius;
+                var newDelta = Math.abs(d) > 1.0 ? 1.0 * (d < 0 ? -1 : 1) : d;
+                if (Math.abs(newDelta * Experiment.physics.lensRadius) < 5) {
+                    newDelta = 0;
+                }
+                Experiment.physics.delta = newDelta;
+                Experiment.draw();
+                return;
+            }
+            if (Math.abs(point.x) < 5 && Math.abs(point.y - Experiment.physics.lensRadius * Experiment.physics.delta) < 5) {
+                Experiment.canvas.style.cursor = "s-resize";
+            } else {
+                Experiment.canvas.style.cursor = "default";
+            }
             return;
         }
         var ctx = Experiment.getContext();
@@ -78,9 +115,14 @@ var Experiment = {
             h = this.canvas.height;
         ctx.clearRect(-w / 2, -h / 2, w, h);
 
+        var coordY = Experiment.physics.lensRadius * Experiment.physics.delta;
+
+        // Draw dashed lines
         ctx.setLineDash([5, 3]); /*dashes are 5px and spaces are 3px*/
         ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
         ctx.beginPath();
+        ctx.moveTo(-w / 2, coordY);
+        ctx.lineTo(w / 2, coordY);
         ctx.moveTo(-w / 2, 0);
         ctx.lineTo(w / 2, 0);
         ctx.moveTo(0, -h / 2);
@@ -106,28 +148,31 @@ var Experiment = {
         ctx.strokeStyle = "rgba(100, 0, 0, 1.0)";
         ctx.beginPath();
         ctx.moveTo(Experiment.physics.ray.x, Experiment.physics.ray.y);
-        ctx.lineTo(0, 0);
+        ctx.lineTo(0, coordY);
         ctx.stroke();
 
         // Draw reflected ray
         ctx.strokeStyle = "rgba(0, 0, 100, 1.0)";
         ctx.beginPath();
-        ctx.moveTo(Experiment.physics.ray.x, -Experiment.physics.ray.y);
-        ctx.lineTo(0, 0);
+        ctx.moveTo(Experiment.physics.ray.x, 2*coordY - Experiment.physics.ray.y);
+        ctx.lineTo(0, coordY);
         ctx.stroke();
 
         ctx.strokeStyle = "rgba(0, 0, 0, 1.0)";
-        var rayLength = Math.sqrt(Math.pow(Experiment.physics.ray.x, 2) + Math.pow(Experiment.physics.ray.y, 2));
 
-        var sinFi2 = (Experiment.physics.n1 / Experiment.physics.n2) * (Math.abs(Experiment.physics.ray.y) / rayLength);
-        var newRayLength = Math.min(rayLength, w / 2 - 30);
-        var newY = newRayLength * sinFi2 * (Experiment.physics.ray.y < 0 ? 1 : -1);
-        var newX = Math.sqrt(Math.pow(newRayLength, 2) - Math.pow(newY, 2));
+        var rayLength = Math.sqrt(Math.pow(Experiment.physics.ray.x, 2) + Math.pow(coordY - Experiment.physics.ray.y, 2));
 
+        var sinFi2 = (Experiment.physics.n1 / Experiment.physics.n2) * (Math.abs(coordY - Experiment.physics.ray.y) / rayLength);
+        var newY = rayLength * sinFi2 * (coordY - Experiment.physics.ray.y > 0 ? 1 : -1) + coordY;
+        var newX = Math.sqrt(Math.pow(rayLength, 2) - Math.pow(newY - coordY, 2));
+        
         ctx.beginPath();
         ctx.moveTo(newX, newY);
-        ctx.lineTo(0, 0);
+        ctx.lineTo(0, coordY);
         ctx.stroke();
+
+
+        ctx.fillRect(0, Experiment.physics.lensRadius * Experiment.physics.delta, 10, 10);
     }
 };
 
