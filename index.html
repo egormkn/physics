@@ -4,21 +4,22 @@
 		<meta charset="utf-8"/>
 		<title>Physics experiment</title>
 		<script type="text/javascript" src="./jquery.min.js"></script>
-
-		    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css"/>
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
 	</head>
 	
 	<body>
-		<div style="width:50%; background: #d0FFdd;">
-			<div id="container">
-				<canvas id="canvas"></canvas>
+		<div style="width: 700px; margin: 0px auto;">
+			<div style="background: #d0FFdd;">
+				<div id="container">
+					<canvas id="canvas"></canvas>
+				</div>
 			</div>
-		</div>
 
-		<input type="button" id="button" value="Click">
-		<input type="button" id="button2" value="Click">
-		<input type="button" id="button3" value="Click">
+			<br><br>
+			n<sub>1</sub>: <input type="text" id="input_n1" value="1.00">
+			<br>
+			<br>
+			n<sub>2</sub>: <input type="text" id="input_n2" value="1.33">
+		</div>
 		
 		<script type="text/javascript" src="./experiment.js"></script>
 		
@@ -36,6 +37,7 @@
 			#container {
 				background: #CCC;
 				width: 100%;
+				position: relative;
 			}
 		</style>
 	</body>
