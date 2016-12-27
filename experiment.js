@@ -2,15 +2,15 @@ var Experiment = {
     container: document.getElementById('container'),
     canvas: document.getElementById('canvas'),
     graphics: [
-        document.getElementById('canvas_coord1'), 
-        document.getElementById('canvas_coord2'), 
-        document.getElementById('canvas_coord3'), 
+        document.getElementById('canvas_coord1'),
+        document.getElementById('canvas_coord2'),
+        document.getElementById('canvas_coord3'),
         document.getElementById('canvas_coord4')
     ],
     graphicsContainer: [
-        document.getElementById('container_coord1'), 
-        document.getElementById('container_coord2'), 
-        document.getElementById('container_coord3'), 
+        document.getElementById('container_coord1'),
+        document.getElementById('container_coord2'),
+        document.getElementById('container_coord3'),
         document.getElementById('container_coord4')
     ],
     graphicsCtx: [],
@@ -20,6 +20,8 @@ var Experiment = {
     ctx: undefined,
     moveRay: false,
     moveStart: false,
+    interval: undefined,
+    colors: ["rgba(0, 0, 0, 1.0)", "rgba(200, 0, 0, 1.0)", "rgba(0, 200, 0, 1.0)", "rgba(0, 0, 200, 1.0)"],
     physics: {
         ray: {
             x: -100,
@@ -29,7 +31,22 @@ var Experiment = {
         n2: 1.33,
         i: 1,
         lensRadius: 50,
-        delta: -0.5
+        delta: -0.5,
+        vectors: []
+    },
+    start: function () {
+        Experiment.interval = setInterval(function () {
+            for (var i = 0; i < 5; i++) {
+                Experiment.physics.vectors[i] = {
+                    x: Math.random() * 100 - 50,
+                    y: Math.random() * 100 - 50
+                };
+            }
+            Experiment.drawGraphics();
+        }, 200);
+    },
+    stop: function () {
+        clearInterval(Experiment.interval);
     },
     getContext: function (sizeChanged) {
         if (this.ctx === undefined) {
@@ -97,6 +114,7 @@ var Experiment = {
         Experiment.moveRay = false;*/
     },
     onMouseDown: function (e) {
+        Experiment.stop();
         var point = Experiment.getPoint(e);
         if (Math.abs(point.x) < 5 && Math.abs(point.y - Experiment.physics.lensRadius * Experiment.physics.delta) < 5) {
             Experiment.moveStart = true;
@@ -114,11 +132,15 @@ var Experiment = {
         Experiment.moveRay = false;
         Experiment.moveStart = false;
         Experiment.canvas.style.cursor = "default";
+        Experiment.draw(true);
+        Experiment.start();
     },
     onMouseOut: function (e) {
         Experiment.moveRay = false;
         Experiment.moveStart = false;
         Experiment.canvas.style.cursor = "default";
+        Experiment.draw(true);
+        Experiment.start();
     },
     onMouseMove: function (e) {
         if (!Experiment.moveRay) {
@@ -147,16 +169,18 @@ var Experiment = {
         Experiment.physics.ray.y = point.y;
         Experiment.draw();
     },
-    draw: function () {
+    draw: function (update) {
         var ctx = Experiment.getContext();
         var w = this.canvas.width,
             h = this.canvas.height;
+        ctx.fillStyle = "rgba(255, 255, 255, 1.0)";
         ctx.clearRect(-w / 2, -h / 2, w, h);
+        //ctx.fill();
 
         var coordY = Experiment.physics.lensRadius * -Experiment.physics.delta;
 
         // Draw dashed lines
-        ctx.setLineDash([5, 3]); /*dashes are 5px and spaces are 3px*/
+        ctx.setLineDash([5, 3]); /* dashes are 5px and spaces are 3px */
         ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
         ctx.beginPath();
         ctx.moveTo(-w / 2, -coordY);
@@ -182,7 +206,7 @@ var Experiment = {
         ctx.lineWidth = 1;
 
         // Draw main ray
-        ctx.strokeStyle = "rgba(100, 0, 0, 1.0)";
+        ctx.strokeStyle = Experiment.colors[0];
         ctx.beginPath();
         ctx.moveTo(Experiment.physics.ray.x, Experiment.physics.ray.y);
         ctx.lineTo(0, -coordY);
@@ -195,13 +219,13 @@ var Experiment = {
 
 
         // Draw reflected ray
-        ctx.strokeStyle = "rgba(0, 0, 100, 1.0)";
+        ctx.strokeStyle = Experiment.colors[2];
         ctx.beginPath();
         ctx.moveTo(Experiment.physics.ray.x, 2 * -coordY - Experiment.physics.ray.y);
         ctx.lineTo(0, -coordY);
         ctx.stroke();
 
-        ctx.strokeStyle = "rgba(0, 0, 0, 1.0)";
+
 
         var rayLength = Math.sqrt(Math.pow(Experiment.physics.ray.x, 2) + Math.pow(-coordY - Experiment.physics.ray.y, 2));
         var sinFi2 = (Experiment.physics.n1 / Experiment.physics.n2) * (Math.abs(-coordY - Experiment.physics.ray.y) / rayLength);
@@ -220,6 +244,7 @@ var Experiment = {
         }
 
         // Draw ray inside lens
+        ctx.strokeStyle = Experiment.colors[1];
         ctx.beginPath();
         ctx.moveTo(newX, -newY);
         ctx.lineTo(0, -coordY);
@@ -235,7 +260,6 @@ var Experiment = {
             ctx.lineTo(newX * 2, -newY * 2);
             ctx.stroke();
             ctx.setLineDash([0, 0]);
-            ctx.strokeStyle = "rgba(0, 0, 0, 1.0)";
         }
 
         // tgFi2 - коэфф. наклона луча в линзе
@@ -255,12 +279,13 @@ var Experiment = {
 
         var b = newY - ray3Tan * newX;
 
-        
 
+
+        ctx.strokeStyle = Experiment.colors[3];
         // Draw ray outside lens
         ctx.beginPath();
         ctx.moveTo(newX, -newY);
-        ctx.lineTo(w/2, -(ray3Tan * w/2 + b));
+        ctx.lineTo(w / 2, -(ray3Tan * w / 2 + b));
         ctx.stroke();
 
         var tanRay3 = Math.tan(Math.atan((newY) / (newX)) - Math.asin(sinPsi1));
@@ -268,10 +293,11 @@ var Experiment = {
         ctx.fillStyle = "rgba(255, 0, 0, 0.6)";
         ctx.fillRect(-2, Experiment.physics.lensRadius * Experiment.physics.delta - 2, 4, 4);
 
-
-
-
-
+        if (update) {
+            Experiment.drawGraphics();
+        }
+    },
+    drawGraphics: function () {
         var gctx = Experiment.getGraphicsContext();
         for (var i = 0; i < 4; i++) {
             var ctx = gctx[i];
@@ -290,21 +316,28 @@ var Experiment = {
             ctx.stroke();
             ctx.setLineDash([0, 0]);
 
-            ctx.strokeStyle = "rgba(0, 0, 0, 1.0)";
-            canvas_arrow(ctx, 0, 0, Math.random() * 100 - 50, Math.random() * 100 - 50);
+            ctx.strokeStyle = ctx.strokeStyle = Experiment.colors[i];
+
+            for (var j = 0; j < Experiment.physics.vectors.length; j++) {
+                canvas_arrow(ctx, 0, 0, Experiment.physics.vectors[j].x, Experiment.physics.vectors[j].y);
+            }
             ctx.stroke();
+
+            /*var arrows = new Path2D();
+
+            */
         }
     }
 };
 
-function canvas_arrow(context, fromx, fromy, tox, toy){
+function canvas_arrow(context, fromx, fromy, tox, toy) {
     var headlen = 5;   // length of head in pixels
-    var angle = Math.atan2(toy-fromy,tox-fromx);
+    var angle = Math.atan2(toy - fromy, tox - fromx);
     context.moveTo(fromx, fromy);
     context.lineTo(tox, toy);
-    context.lineTo(tox-headlen*Math.cos(angle-Math.PI/6),toy-headlen*Math.sin(angle-Math.PI/6));
+    context.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
     context.moveTo(tox, toy);
-    context.lineTo(tox-headlen*Math.cos(angle+Math.PI/6),toy-headlen*Math.sin(angle+Math.PI/6));
+    context.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
 }
 
 function solveSqrEquation(a, b, c) { // ax^2 + bx + c = 0
@@ -323,12 +356,18 @@ function solveSqrEquation(a, b, c) { // ax^2 + bx + c = 0
 };*/
 
 $(document).ready(function () {
+    for (var i = 0; i < 5; i++) {
+        Experiment.physics.vectors[i] = {
+            x: Math.random() * 100 - 50,
+            y: Math.random() * 100 - 50
+        };
+    }
     Experiment.physics.n1 = $(Experiment.n1Field).val();
     Experiment.physics.n2 = $(Experiment.n2Field).val();
     Experiment.physics.i = $(Experiment.iField).val();
     Experiment.setWidth("auto");
+    Experiment.start();
 });
-
 
 
 // listen for mouse events
