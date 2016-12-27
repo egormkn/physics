@@ -35,6 +35,7 @@ var Experiment = {
         vectors: []
     },
     start: function () {
+        clearInterval(Experiment.interval);
         Experiment.interval = setInterval(function () {
             for (var i = 0; i < 5; i++) {
                 Experiment.physics.vectors[i] = {
