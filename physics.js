@@ -63,12 +63,14 @@ function generate_unpolarized_waves(amplitude) {
     return result;
 }
 
-function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplitude, polarization) {
+function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplitude, polarization, engle) {
     var result_array = [];
     if (polarization) {
         result_array[0] = [];
-        result_array[0][0] = create_vector(0, amplitude);
-        result_array[0][1] = create_vector(0, -amplitude);
+        var x = amplitude * Math.cos(angle);
+        var y = amplitude * Math.sin(angle);
+        result_array[0][0] = create_vector(x, y);
+        result_array[0][1] = create_vector(-x, -y);
     } else {
         result_array[0] = generate_unpolarized_waves(amplitude);
     }
