@@ -17,6 +17,7 @@ var Experiment = {
     n1Field: document.getElementById('input_n1'),
     n2Field: document.getElementById('input_n2'),
     iField: document.getElementById('input_i'),
+    aField: document.getElementById('input_a'),
     ctx: undefined,
     moveRay: false,
     moveStart: false,
@@ -32,17 +33,18 @@ var Experiment = {
         i: 1,
         lensRadius: 50,
         delta: -0.5,
+        alpha1: 0,
+        beta1: 0,
+        alpha2: 0,
+        beta2: 0,
+        amplitude: 100,
         vectors: []
     },
     start: function () {
         clearInterval(Experiment.interval);
         Experiment.interval = setInterval(function () {
-            for (var i = 0; i < 20; i++) {
-                Experiment.physics.vectors[i] = {
-                    x: Math.random() * 100 - 50,
-                    y: Math.random() * 100 - 50
-                };
-            }
+            var physics = Experiment.physics;
+            Experiment.physics.vectors = generate_arrays_of_vectors(physics.alpha1, physics.beta1, physics.alpha2, physics.beta2, physics.n1, physics.n2, physics.amplitude);
             Experiment.drawGraphics();
         }, 20);
     },
@@ -133,14 +135,14 @@ var Experiment = {
         Experiment.moveRay = false;
         Experiment.moveStart = false;
         Experiment.canvas.style.cursor = "default";
-        Experiment.draw(true);
+        Experiment.draw();
         Experiment.start();
     },
     onMouseOut: function (e) {
         Experiment.moveRay = false;
         Experiment.moveStart = false;
         Experiment.canvas.style.cursor = "default";
-        Experiment.draw(true);
+        Experiment.draw();
         Experiment.start();
     },
     onMouseMove: function (e) {
@@ -227,10 +229,14 @@ var Experiment = {
         ctx.stroke();
 
 
-
+        
         var rayLength = Math.sqrt(Math.pow(Experiment.physics.ray.x, 2) + Math.pow(-coordY - Experiment.physics.ray.y, 2));
-        var sinFi2 = (Experiment.physics.n1 / Experiment.physics.n2) * (Math.abs(-coordY - Experiment.physics.ray.y) / rayLength);
+        var sinFi1 = Math.abs(-coordY - Experiment.physics.ray.y) / rayLength;
+        var sinFi2 = (Experiment.physics.n1 / Experiment.physics.n2) * sinFi1;
         var tgFi2 = Math.tan(Math.asin(sinFi2)) * (-coordY - Experiment.physics.ray.y > 0 ? -1 : 1);
+
+        Experiment.physics.alpha1 = Math.asin(sinFi1);
+        Experiment.physics.beta1 = Math.asin(sinFi2);
 
         var a = tgFi2 * tgFi2 + 1;
         var b = 2 * tgFi2 * coordY;
@@ -276,6 +282,9 @@ var Experiment = {
         // console.log("Угол преломления: " + Math.asin(sinPsi1)*180/Math.PI);
         var tanPsi1 = Math.tan(Math.asin(sinPsi1));
 
+        Experiment.physics.alpha2 = Math.asin(sinPsi2);
+        Experiment.physics.beta2 = Math.asin(sinFi2);
+
         var ray3Tan = Math.tan(Math.atan(tgNormal) - Math.atan(tanPsi1)); // Or +
 
         var b = newY - ray3Tan * newX;
@@ -319,8 +328,8 @@ var Experiment = {
 
             ctx.strokeStyle = ctx.strokeStyle = Experiment.colors[i];
 
-            for (var j = 0; j < Experiment.physics.vectors.length; j++) {
-                canvas_arrow(ctx, 0, 0, Experiment.physics.vectors[j].x, Experiment.physics.vectors[j].y);
+            for (var j = 0; j < Experiment.physics.vectors[i].length; j++) {
+                canvas_arrow(ctx, 0, 0, Experiment.physics.vectors[i][j].x, Experiment.physics.vectors[i][j].y);
             }
             ctx.stroke();
         }
@@ -353,15 +362,10 @@ function solveSqrEquation(a, b, c) { // ax^2 + bx + c = 0
 };*/
 
 $(document).ready(function () {
-    for (var i = 0; i < 20; i++) {
-        Experiment.physics.vectors[i] = {
-            x: Math.random() * 100 - 50,
-            y: Math.random() * 100 - 50
-        };
-    }
     Experiment.physics.n1 = $(Experiment.n1Field).val();
     Experiment.physics.n2 = $(Experiment.n2Field).val();
     Experiment.physics.i = $(Experiment.iField).val();
+    Experiment.physics.amplitude = $(Experiment.aField).val();
     Experiment.setWidth("auto");
     Experiment.start();
 });
@@ -405,5 +409,11 @@ $(Experiment.n2Field).on('input', function (e) {
 $(Experiment.iField).on('input', function (e) {
     var value = $(this).val();
     Experiment.physics.i = parseFloat(value);
+    Experiment.draw();
+});
+
+$(Experiment.aField).on('input', function (e) {
+    var value = $(this).val();
+    Experiment.physics.amplitude = parseFloat(value);
     Experiment.draw();
 });
