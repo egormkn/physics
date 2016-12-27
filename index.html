@@ -14,7 +14,34 @@
 				</div>
 			</div>
 
-			<br><br>
+			<br>
+			<table>
+				<tr>
+					<td>
+						<div id="container_coord1">
+							<canvas id="canvas_coord1"></canvas>
+						</div>
+					</td>
+					<td>
+						<div id="container_coord2">
+							<canvas id="canvas_coord2"></canvas>
+						</div>
+					</td>
+					<td>
+						<div id="container_coord3">
+							<canvas id="canvas_coord3"></canvas>
+						</div>
+					</td>
+					<td>
+						<div id="container_coord4">
+							<canvas id="canvas_coord4"></canvas>
+						</div>
+					</td>
+				</tr>
+			</table>
+			
+			<br>
+			<br>
 			n<sub>1</sub>: <input type="text" id="input_n1" value="1.00">
 			<br>
 			<br>
@@ -22,6 +49,7 @@
 			<br>
 			<br>
 			I<sub>вход</sub>: <input type="text" id="input_i" value="1">
+
 		</div>
 		
 		<script type="text/javascript" src="./experiment.js"></script>
@@ -33,7 +61,12 @@
 				padding: 0;
 				border: 0;
 			}
-			#canvas {
+			table, tr, td {
+				padding: 0px;
+				margin: 0px;
+				border-collapse: collapse;
+			}
+			canvas {
 				border: 1px solid #000;
 				vertical-align: top;
 			}

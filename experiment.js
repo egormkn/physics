@@ -1,6 +1,19 @@
 var Experiment = {
     container: document.getElementById('container'),
     canvas: document.getElementById('canvas'),
+    graphics: [
+        document.getElementById('canvas_coord1'), 
+        document.getElementById('canvas_coord2'), 
+        document.getElementById('canvas_coord3'), 
+        document.getElementById('canvas_coord4')
+    ],
+    graphicsContainer: [
+        document.getElementById('container_coord1'), 
+        document.getElementById('container_coord2'), 
+        document.getElementById('container_coord3'), 
+        document.getElementById('container_coord4')
+    ],
+    graphicsCtx: [],
     n1Field: document.getElementById('input_n1'),
     n2Field: document.getElementById('input_n2'),
     iField: document.getElementById('input_i'),
@@ -29,12 +42,34 @@ var Experiment = {
         }
         return this.ctx;
     },
+    getGraphicsContext: function (sizeChanged) {
+        if (this.graphicsCtx.length == 0) {
+            for (var i = 0; i < 4; i++) {
+                this.graphicsCtx[i] = this.graphics[i].getContext('2d');
+            }
+        }
+        if (sizeChanged) {
+            for (var i = 0; i < 4; i++) {
+                var w = this.graphics[i].width,
+                    h = this.graphics[i].height;
+                this.graphicsCtx[i].translate(Math.floor(w / 2), Math.floor(h / 2));
+            }
+        }
+        return this.graphicsCtx;
+    },
     setWidth: function (width) {
         if (width == "auto") {
             this.container.style.width = '100%';
             this.container.style.height = Math.floor(this.container.offsetWidth / 16 * 9) + 'px';
             this.canvas.width = this.container.offsetWidth - 2;
             this.canvas.height = this.container.offsetHeight - 2;
+
+            for (var i = 0; i < 4; i++) {
+                this.graphicsContainer[i].style.width = this.container.offsetWidth / 4 + 'px';
+                this.graphicsContainer[i].height = Math.floor(this.graphicsContainer[i].offsetWidth) + 'px';
+                this.graphics[i].width = this.graphicsContainer[i].offsetWidth - 2;
+                this.graphics[i].height = this.graphicsContainer[i].offsetHeight - 2;
+            }
         } else {
             this.container.style.width = width + 'px';
             this.container.style.height = Math.floor(width / 16 * 9) + 'px';
@@ -42,6 +77,7 @@ var Experiment = {
             this.canvas.height = Math.floor(width / 16 * 9) - 2;
         }
         this.getContext(true);
+        this.getGraphicsContext(true);
         this.draw();
     },
     getPoint: function (e) {
@@ -231,6 +267,30 @@ var Experiment = {
 
         ctx.fillStyle = "rgba(255, 0, 0, 0.6)";
         ctx.fillRect(-2, Experiment.physics.lensRadius * Experiment.physics.delta - 2, 4, 4);
+
+
+
+
+
+        var gctx = Experiment.getGraphicsContext();
+        for (var i = 0; i < 4; i++) {
+            var ctx = gctx[i];
+
+            var w = this.graphics[i].width,
+                h = this.graphics[i].height;
+            ctx.clearRect(-w / 2, -h / 2, w, h);
+
+            ctx.setLineDash([5, 3]); /*dashes are 5px and spaces are 3px*/
+            ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+            ctx.beginPath();
+            ctx.moveTo(-w / 2, 0);
+            ctx.lineTo(w / 2, 0);
+            ctx.moveTo(0, -h / 2);
+            ctx.lineTo(0, h / 2);
+            ctx.stroke();
+            ctx.setLineDash([0, 0]);
+
+        }
     }
 };
 
