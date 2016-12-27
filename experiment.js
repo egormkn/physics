@@ -18,6 +18,10 @@ var Experiment = {
     n2Field: document.getElementById('input_n2'),
     iField: document.getElementById('input_i'),
     aField: document.getElementById('input_a'),
+    alpha1Text: document.getElementById('alpha1'),
+    beta1Text: document.getElementById('beta1'),
+    alpha2Text: document.getElementById('alpha2'),
+    beta2Text: document.getElementById('beta2'),
     ctx: undefined,
     moveRay: false,
     moveStart: false,
@@ -37,7 +41,7 @@ var Experiment = {
         beta1: 0,
         alpha2: 0,
         beta2: 0,
-        amplitude: 100,
+        amplitude: 50,
         vectors: []
     },
     start: function () {
@@ -46,7 +50,7 @@ var Experiment = {
             var physics = Experiment.physics;
             Experiment.physics.vectors = generate_arrays_of_vectors(physics.alpha1, physics.beta1, physics.alpha2, physics.beta2, physics.n1, physics.n2, physics.amplitude);
             Experiment.drawGraphics();
-        }, 20);
+        }, 500);
     },
     stop: function () {
         clearInterval(Experiment.interval);
@@ -238,6 +242,9 @@ var Experiment = {
         Experiment.physics.alpha1 = Math.asin(sinFi1);
         Experiment.physics.beta1 = Math.asin(sinFi2);
 
+        Experiment.alpha1Text.innerHTML = Math.abs(Experiment.physics.alpha1 * 180 / Math.PI).toFixed(2) + " град.";
+        Experiment.beta1Text.innerHTML = Math.abs(Experiment.physics.beta1 * 180 / Math.PI).toFixed(2) + " град.";
+
         var a = tgFi2 * tgFi2 + 1;
         var b = 2 * tgFi2 * coordY;
         var c = coordY * coordY - Math.pow(Experiment.physics.lensRadius, 2);
@@ -283,7 +290,10 @@ var Experiment = {
         var tanPsi1 = Math.tan(Math.asin(sinPsi1));
 
         Experiment.physics.alpha2 = Math.asin(sinPsi2);
-        Experiment.physics.beta2 = Math.asin(sinFi2);
+        Experiment.physics.beta2 = Math.asin(sinPsi1);
+
+        Experiment.alpha2Text.innerHTML = Math.abs(Experiment.physics.alpha2 * 180 / Math.PI).toFixed(2) + " град.";
+        Experiment.beta2Text.innerHTML = Math.abs(Experiment.physics.beta2 * 180 / Math.PI).toFixed(2) + " град.";
 
         var ray3Tan = Math.tan(Math.atan(tgNormal) - Math.atan(tanPsi1)); // Or +
 
@@ -302,10 +312,6 @@ var Experiment = {
 
         ctx.fillStyle = "rgba(255, 0, 0, 0.6)";
         ctx.fillRect(-2, Experiment.physics.lensRadius * Experiment.physics.delta - 2, 4, 4);
-
-        if (update) {
-            Experiment.drawGraphics();
-        }
     },
     drawGraphics: function () {
         var gctx = Experiment.getGraphicsContext();
