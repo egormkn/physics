@@ -42,15 +42,16 @@ var Experiment = {
         alpha2: 0,
         beta2: 0,
         amplitude: 50,
+        polarization: false,
         vectors: []
     },
     start: function () {
         clearInterval(Experiment.interval);
         Experiment.interval = setInterval(function () {
             var physics = Experiment.physics;
-            Experiment.physics.vectors = generate_arrays_of_vectors(physics.alpha1, physics.beta1, physics.alpha2, physics.beta2, physics.n1, physics.n2, physics.amplitude);
+            Experiment.physics.vectors = generate_arrays_of_vectors(physics.alpha1, physics.beta1, physics.alpha2, physics.beta2, physics.n1, physics.n2, physics.amplitude, physics.polarization);
             Experiment.drawGraphics();
-        }, 500);
+        }, 100);
     },
     stop: function () {
         clearInterval(Experiment.interval);
@@ -233,7 +234,7 @@ var Experiment = {
         ctx.stroke();
 
 
-        
+
         var rayLength = Math.sqrt(Math.pow(Experiment.physics.ray.x, 2) + Math.pow(-coordY - Experiment.physics.ray.y, 2));
         var sinFi1 = Math.abs(-coordY - Experiment.physics.ray.y) / rayLength;
         var sinFi2 = (Experiment.physics.n1 / Experiment.physics.n2) * sinFi1;
@@ -322,8 +323,9 @@ var Experiment = {
                 h = this.graphics[i].height;
             ctx.clearRect(-w / 2, -h / 2, w, h);
 
-            ctx.setLineDash([5, 3]); /*dashes are 5px and spaces are 3px*/
+
             ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+            ctx.setLineDash([5, 3]);
             ctx.beginPath();
             ctx.moveTo(-w / 2, 0);
             ctx.lineTo(w / 2, 0);
@@ -332,8 +334,8 @@ var Experiment = {
             ctx.stroke();
             ctx.setLineDash([0, 0]);
 
+            ctx.beginPath();
             ctx.strokeStyle = ctx.strokeStyle = Experiment.colors[i];
-
             for (var j = 0; j < Experiment.physics.vectors[i].length; j++) {
                 canvas_arrow(ctx, 0, 0, Experiment.physics.vectors[i][j].x, Experiment.physics.vectors[i][j].y);
             }
@@ -343,6 +345,7 @@ var Experiment = {
 };
 
 function canvas_arrow(context, fromx, fromy, tox, toy) {
+    // var length = Math.sqrt(Math.pow(fromx - tox, 2) + Math.pow(fromy - toy, 2));
     var headlen = 3;   // length of head in pixels
     var angle = Math.atan2(toy - fromy, tox - fromx);
     context.moveTo(fromx, fromy);
@@ -372,6 +375,7 @@ $(document).ready(function () {
     Experiment.physics.n2 = $(Experiment.n2Field).val();
     Experiment.physics.i = $(Experiment.iField).val();
     Experiment.physics.amplitude = $(Experiment.aField).val();
+    Experiment.physics.polarization = $('input:radio[name="input_type"]:checked').val() == "1";
     Experiment.setWidth("auto");
     Experiment.start();
 });
@@ -422,4 +426,11 @@ $(Experiment.aField).on('input', function (e) {
     var value = $(this).val();
     Experiment.physics.amplitude = parseFloat(value);
     Experiment.draw();
+});
+
+$('input:radio[name="input_type"]').change(function () {
+    if ($(this).is(':checked')) {
+        Experiment.physics.polarization = $(this).val() == "1";
+        Experiment.beta2Text.innerHTML = Experiment.physics.polarization;
+    }
 });
