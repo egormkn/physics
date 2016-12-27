@@ -68,12 +68,12 @@ function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplit
     var first_options = create_options(alpha1, beta1, n1, n2);
     var i;
     for (i = 0; i < result_array[0].length; ++i) {
-        result_array[1].push(get_reflected_vector(first_array[i], first_options));
-        result_array[2].push(get_refracted_vector(first_array[i], first_options))
+        result_array[1].push(get_reflected_vector(result_array[0][i], first_options));
+        result_array[2].push(get_refracted_vector(result_array[0][i], first_options))
     }
     var second_options = create_options(alpha2, beta2, n2, n1);
     for (i = 0; i < result_array[2].length; ++i) {
-        result_array[3].push(get_refracted_vector(third_array[i], second_options));
+        result_array[3].push(get_refracted_vector(result_array[2][i], second_options));
     }
     if (isNaN(beta1)) {
         result_array[1] = result_array[0];
