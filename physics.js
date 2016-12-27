@@ -20,25 +20,25 @@ function create_options(alpha, beta, n1, n2) {
 
 function reflected_perpendicular_amplitude(options) {
     //return (options.n1 * Math.cos(options.alpha) - options.n2 * Math.cos(options.beta)) / (options.n1 * Math.cos(options.alpha) + options.n2 * Math.cos(options.beta));
-    if (options.alpha == 0) return -(options.n2 - options.n1) /  (options.n2 + options.n1);
+    if (options.alpha == 0) return -(options.n2 - options.n1) / (options.n2 + options.n1);
     return -Math.sin(options.alpha - options.beta) / Math.sin(options.alpha + options.beta);
 }
 
 function reflected_parallel_amplitude(options) {
     //return (options.n2 * Math.cos(options.alpha) - options.n1 * Math.cos(options.beta)) / (options.n2 * Math.cos(options.alpha) + options.n1 * Math.cos(options.beta));
-    if (options.alpha == 0) return (options.n2 - options.n1) /  (options.n2 + options.n1);
+    if (options.alpha == 0) return (options.n2 - options.n1) / (options.n2 + options.n1);
     return Math.tan(options.alpha - options.beta) / Math.tan(options.alpha + options.beta);
 }
 
 function refracted_perpendicular_amplitude(options) {
     //return (2 * options.n1 * Math.cos(options.alpha)) / (options.n2 * Math.cos(options.beta) + options.n1 * Math.cos(options.alpha))
-    if (options.alpha == 0) return (2 * options.n1) /  (options.n2 + options.n1);
+    if (options.alpha == 0) return (2 * options.n1) / (options.n2 + options.n1);
     return (2 * Math.sin(options.beta) * Math.cos(options.alpha)) / (Math.sin(options.alpha + options.beta));
 }
 
 function refracted_parallel_amplitude(options) {
     //return (2 * options.n1 * Math.cos(options.alpha)) / (options.n2 * Math.cos(options.alpha) + options.n1 * Math.cos(options.beta))
-    if (options.alpha == 0) return (2 * options.n1) /  (options.n2 + options.n1);
+    if (options.alpha == 0) return (2 * options.n1) / (options.n2 + options.n1);
     return (2 * Math.sin(options.beta) * Math.cos(options.alpha)) / (Math.sin(options.alpha + options.beta) * Math.cos(options.alpha - options.beta))
 }
 
@@ -63,9 +63,15 @@ function generate_unpolarized_waves(amplitude) {
     return result;
 }
 
-function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplitude) {
+function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplitude, polarization) {
     var result_array = [];
-    result_array[0] = generate_unpolarized_waves(amplitude);
+    if (polarization) {
+        result_array[0] = [];
+        result_array[0][0] = create_vector(0, amplitude);
+        result_array[0][1] = create_vector(0, -amplitude);
+    } else {
+        result_array[0] = generate_unpolarized_waves(amplitude);
+    }
     result_array[1] = [];
     result_array[2] = [];
     result_array[3] = [];
