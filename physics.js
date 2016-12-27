@@ -57,11 +57,14 @@ function get_refracted_vector(vector, options) {
 
 function generate_unpolarized_waves(amplitude) {
     var result = [];
-    for (var i = 0; i < 100; ++i) {
+    for (var i = 0; i < 20; ++i) {
         var angle = Math.random() * 2 * Math.PI;
         var perpendicular_amplitude = amplitude * Math.cos(angle);
         var parallel_amplitude = amplitude * Math.sin(angle);
-        result.push(create_vector(perpendicular_amplitude, Math.cos, parallel_amplitude, Math.cos))
+        var vector_function = function (time) {
+            return Math.cos(time / 1500)
+        };
+        result.push(create_vector(perpendicular_amplitude, vector_function, parallel_amplitude, vector_function))
     }
     return result;
 }
