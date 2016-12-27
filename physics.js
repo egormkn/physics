@@ -95,5 +95,5 @@ function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplit
 }
 
 function get_intensity(physics) {
-    return [0, 0, 0, 0];
+    return [physics.i, 0, 0, 0];
 }
