@@ -290,9 +290,22 @@ var Experiment = {
             ctx.stroke();
             ctx.setLineDash([0, 0]);
 
+            ctx.strokeStyle = "rgba(0, 0, 0, 1.0)";
+            canvas_arrow(ctx, 0, 0, Math.random() * 100 - 50, Math.random() * 100 - 50);
+            ctx.stroke();
         }
     }
 };
+
+function canvas_arrow(context, fromx, fromy, tox, toy){
+    var headlen = 5;   // length of head in pixels
+    var angle = Math.atan2(toy-fromy,tox-fromx);
+    context.moveTo(fromx, fromy);
+    context.lineTo(tox, toy);
+    context.lineTo(tox-headlen*Math.cos(angle-Math.PI/6),toy-headlen*Math.sin(angle-Math.PI/6));
+    context.moveTo(tox, toy);
+    context.lineTo(tox-headlen*Math.cos(angle+Math.PI/6),toy-headlen*Math.sin(angle+Math.PI/6));
+}
 
 function solveSqrEquation(a, b, c) { // ax^2 + bx + c = 0
     var D = b * b - 4 * a * c;
