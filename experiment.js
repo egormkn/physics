@@ -3,6 +3,7 @@ var Experiment = {
     canvas: document.getElementById('canvas'),
     n1Field: document.getElementById('input_n1'),
     n2Field: document.getElementById('input_n2'),
+    iField: document.getElementById('input_i'),
     ctx: undefined,
     moveRay: false,
     moveStart: false,
@@ -13,6 +14,7 @@ var Experiment = {
         },
         n1: 1,
         n2: 1.33,
+        i: 1,
         lensRadius: 50,
         delta: -0.5
     },
@@ -150,6 +152,12 @@ var Experiment = {
         ctx.lineTo(0, -coordY);
         ctx.stroke();
 
+        ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+        ctx.font = "16px serif";
+        var iTextY = -Experiment.physics.ray.y < coordY ? Experiment.physics.ray.y + 20 : Experiment.physics.ray.y - 5;
+        ctx.fillText("I = " + Experiment.physics.i + " Вт/м^2", Experiment.physics.ray.x + 10, iTextY);
+
+
         // Draw reflected ray
         ctx.strokeStyle = "rgba(0, 0, 100, 1.0)";
         ctx.beginPath();
@@ -182,15 +190,17 @@ var Experiment = {
         ctx.stroke();
 
 
-        // Draw normal line inside lens
-        ctx.setLineDash([5, 3]); /*dashes are 5px and spaces are 3px*/
-        ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(newX*2, -newY*2);
-        ctx.stroke();
-        ctx.setLineDash([0, 0]);
-        ctx.strokeStyle = "rgba(0, 0, 0, 1.0)";
+        if (coordY != 0) {
+            // Draw normal line inside lens
+            ctx.setLineDash([5, 3]); /*dashes are 5px and spaces are 3px*/
+            ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(newX * 2, -newY * 2);
+            ctx.stroke();
+            ctx.setLineDash([0, 0]);
+            ctx.strokeStyle = "rgba(0, 0, 0, 1.0)";
+        }
 
         // tgFi2 - коэфф. наклона луча в линзе
         // tgNormal - коэфф. наклона нормали
@@ -210,10 +220,11 @@ var Experiment = {
         var b = newY - ray3Tan * newX;
 
         
+
         // Draw ray outside lens
         ctx.beginPath();
         ctx.moveTo(newX, -newY);
-        ctx.lineTo(rayLength*2, -(ray3Tan*rayLength*2 + b));
+        ctx.lineTo(w/2, -(ray3Tan * w/2 + b));
         ctx.stroke();
 
         var tanRay3 = Math.tan(Math.atan((newY) / (newX)) - Math.asin(sinPsi1));
@@ -239,6 +250,9 @@ function solveSqrEquation(a, b, c) { // ax^2 + bx + c = 0
 };*/
 
 $(document).ready(function () {
+    Experiment.physics.n1 = $(Experiment.n1Field).val();
+    Experiment.physics.n2 = $(Experiment.n2Field).val();
+    Experiment.physics.i = $(Experiment.iField).val();
     Experiment.setWidth("auto");
 });
 
@@ -276,5 +290,11 @@ $(Experiment.n1Field).on('input', function (e) {
 $(Experiment.n2Field).on('input', function (e) {
     var value = $(this).val();
     Experiment.physics.n2 = parseFloat(value);
+    Experiment.draw();
+});
+
+$(Experiment.iField).on('input', function (e) {
+    var value = $(this).val();
+    Experiment.physics.i = parseFloat(value);
     Experiment.draw();
 });
