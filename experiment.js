@@ -192,28 +192,31 @@ var Experiment = {
         ctx.setLineDash([0, 0]);
         ctx.strokeStyle = "rgba(0, 0, 0, 1.0)";
 
-
+        // tgFi2 - коэфф. наклона луча в линзе
+        // tgNormal - коэфф. наклона нормали
+        var tgNormal = newY / newX;
+        var tgBetweenInsideRayAndNormal = -(tgFi2 - tgNormal) / (1 + tgFi2 * tgNormal);
         // TODO
+
+        var sinPsi2 = Math.sin(Math.atan(tgBetweenInsideRayAndNormal));
+        // console.log("Угол падения: " + Math.asin(sinPsi2)*180/Math.PI);
+
+        var sinPsi1 = (Experiment.physics.n2 / Experiment.physics.n1) * sinPsi2;
+        // console.log("Угол преломления: " + Math.asin(sinPsi1)*180/Math.PI);
+        var tanPsi1 = Math.tan(Math.asin(sinPsi1));
+
+        var ray3Tan = Math.tan(Math.atan(tgNormal) - Math.atan(tanPsi1)); // Or +
+
+        var b = newY - ray3Tan * newX;
+
         
-        // var angleRefraction1 = Math.asin(sinFi2) * 180 / Math.PI;
-        var anglePsi2 = Math.atan(Math.abs(newY) / newX) - Math.asin(sinFi2);
-        console.log(Math.min(anglePsi2, Math.PI - anglePsi2) * 180 / Math.PI);
-        var derivative = (newY - coordY) / newX;
-
-        var sinPsi2 = 0;
-        var sinPsi1 = (Experiment.physics.n2 / Experiment.physics.n1) * Math.sin(sinPsi2);
-
-        var tanRay3 = Math.tan(Math.atan((newY) / (newX)) - Math.asin(sinPsi1));
-
-        /*ctx.beginPath();
-        ctx.moveTo(newX, newY -coordY);
-        ctx.lineTo(newX + 100, tanRay3*(100) + newY -coordY);
+        // Draw ray outside lens
+        ctx.beginPath();
+        ctx.moveTo(newX, -newY);
+        ctx.lineTo(rayLength*2, -(ray3Tan*rayLength*2 + b));
         ctx.stroke();
 
-        ctx.beginPath();
-        ctx.moveTo(100, 100*derivative);
-        ctx.lineTo(0, 0);
-        ctx.stroke();*/
+        var tanRay3 = Math.tan(Math.atan((newY) / (newX)) - Math.asin(sinPsi1));
 
         ctx.fillStyle = "rgba(255, 0, 0, 0.6)";
         ctx.fillRect(-2, Experiment.physics.lensRadius * Experiment.physics.delta - 2, 4, 4);
