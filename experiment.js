@@ -18,6 +18,7 @@ var Experiment = {
     n2Field: document.getElementById('input_n2'),
     iField: document.getElementById('input_i'),
     aField: document.getElementById('input_a'),
+    angleField: document.getElementById('input_angle'),
     alpha1Text: document.getElementById('alpha1'),
     beta1Text: document.getElementById('beta1'),
     alpha2Text: document.getElementById('alpha2'),
@@ -43,13 +44,14 @@ var Experiment = {
         beta2: 0,
         amplitude: 50,
         polarization: false,
+        angle: 0,
         vectors: []
     },
     start: function () {
         clearInterval(Experiment.interval);
         Experiment.interval = setInterval(function () {
             var physics = Experiment.physics;
-            Experiment.physics.vectors = generate_arrays_of_vectors(physics.alpha1, physics.beta1, physics.alpha2, physics.beta2, physics.n1, physics.n2, physics.amplitude, physics.polarization);
+            Experiment.physics.vectors = generate_arrays_of_vectors(physics.alpha1, physics.beta1, physics.alpha2, physics.beta2, physics.n1, physics.n2, physics.amplitude, physics.polarization, physics.angle);
             Experiment.drawGraphics();
         }, 100);
     },
@@ -375,7 +377,8 @@ $(document).ready(function () {
     Experiment.physics.n2 = $(Experiment.n2Field).val();
     Experiment.physics.i = $(Experiment.iField).val();
     Experiment.physics.amplitude = $(Experiment.aField).val();
-    Experiment.physics.polarization = $('input:radio[name="input_type"]:checked').val() == "1";
+    Experiment.physics.polarization = $('.input_type:checked').val() == "1";
+    $(Experiment.angleField).prop('disabled', !Experiment.physics.polarization);
     Experiment.setWidth("auto");
     Experiment.start();
 });
@@ -431,6 +434,12 @@ $(Experiment.aField).on('input', function (e) {
 $('input:radio[name="input_type"]').change(function () {
     if ($(this).is(':checked')) {
         Experiment.physics.polarization = $(this).val() == "1";
-        Experiment.beta2Text.innerHTML = Experiment.physics.polarization;
+        $(Experiment.angleField).prop('disabled', !Experiment.physics.polarization);
     }
+});
+
+$(Experiment.angleField).on('input', function (e) {
+    var value = $(this).val();
+    Experiment.physics.angle = parseFloat(value);
+    Experiment.draw();
 });

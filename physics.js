@@ -63,7 +63,8 @@ function generate_unpolarized_waves(amplitude) {
     return result;
 }
 
-function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplitude, polarization, engle) {
+function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplitude, polarization, angle) {
+    angle = angle * Math.PI / 180;
     var result_array = [];
     if (polarization) {
         result_array[0] = [];

@@ -62,6 +62,10 @@
 						<input class="input_type" name="input_type" type="radio" value="0" id="type0" checked="true"> <label for="type0">Естественный</label>
 						<br>
 						<input class="input_type" name="input_type" type="radio" value="1" id="type1"> <label for="type1">Линейно поляризованный</label>
+						<br>
+						<br>
+						Угол поляризации: <br>
+						<input id="input_angle" type="range" min="0" max="180" step="1" value="0"> 
 					</td>
 					<td colspan="2">
 						<br>
@@ -90,6 +94,8 @@
 				margin: 0;
 				padding: 0;
 				border: 0;
+				font-family: monospace;
+				font-weight: bold;
 			}
 			table, tr, td {
 				padding: 0px;
