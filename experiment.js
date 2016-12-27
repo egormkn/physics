@@ -23,6 +23,10 @@ var Experiment = {
     beta1Text: document.getElementById('beta1'),
     alpha2Text: document.getElementById('alpha2'),
     beta2Text: document.getElementById('beta2'),
+    i1Text: document.getElementById('i1'),
+    i2Text: document.getElementById('i2'),
+    i3Text: document.getElementById('i3'),
+    i4Text: document.getElementById('i4'),
     ctx: undefined,
     moveRay: false,
     moveStart: false,
@@ -45,13 +49,19 @@ var Experiment = {
         amplitude: 50,
         polarization: false,
         angle: 0,
-        vectors: []
+        vectors: [],
+        intensity: []
     },
     start: function () {
         clearInterval(Experiment.interval);
         Experiment.interval = setInterval(function () {
             var physics = Experiment.physics;
             Experiment.physics.vectors = generate_arrays_of_vectors(physics.alpha1, physics.beta1, physics.alpha2, physics.beta2, physics.n1, physics.n2, physics.amplitude, physics.polarization, physics.angle);
+            Experiment.physics.intensity = get_intensity(physics);
+            Experiment.i1Text.innerHTML = Experiment.physics.intensity[0];
+            Experiment.i2Text.innerHTML = Experiment.physics.intensity[1];
+            Experiment.i3Text.innerHTML = Experiment.physics.intensity[2];
+            Experiment.i4Text.innerHTML = Experiment.physics.intensity[3];
             Experiment.drawGraphics();
         }, 100);
     },
