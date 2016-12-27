@@ -21,7 +21,7 @@ var Experiment = {
     moveRay: false,
     moveStart: false,
     interval: undefined,
-    colors: ["rgba(0, 0, 0, 1.0)", "rgba(200, 0, 0, 1.0)", "rgba(0, 200, 0, 1.0)", "rgba(0, 0, 200, 1.0)"],
+    colors: ["rgba(0, 0, 0, 1.0)", "rgba(0, 200, 0, 1.0)", "rgba(200, 0, 0, 1.0)", "rgba(0, 0, 200, 1.0)"],
     physics: {
         ray: {
             x: -100,
@@ -37,14 +37,14 @@ var Experiment = {
     start: function () {
         clearInterval(Experiment.interval);
         Experiment.interval = setInterval(function () {
-            for (var i = 0; i < 5; i++) {
+            for (var i = 0; i < 20; i++) {
                 Experiment.physics.vectors[i] = {
                     x: Math.random() * 100 - 50,
                     y: Math.random() * 100 - 50
                 };
             }
             Experiment.drawGraphics();
-        }, 200);
+        }, 20);
     },
     stop: function () {
         clearInterval(Experiment.interval);
@@ -220,7 +220,7 @@ var Experiment = {
 
 
         // Draw reflected ray
-        ctx.strokeStyle = Experiment.colors[2];
+        ctx.strokeStyle = Experiment.colors[1];
         ctx.beginPath();
         ctx.moveTo(Experiment.physics.ray.x, 2 * -coordY - Experiment.physics.ray.y);
         ctx.lineTo(0, -coordY);
@@ -245,7 +245,7 @@ var Experiment = {
         }
 
         // Draw ray inside lens
-        ctx.strokeStyle = Experiment.colors[1];
+        ctx.strokeStyle = Experiment.colors[2];
         ctx.beginPath();
         ctx.moveTo(newX, -newY);
         ctx.lineTo(0, -coordY);
@@ -323,16 +323,12 @@ var Experiment = {
                 canvas_arrow(ctx, 0, 0, Experiment.physics.vectors[j].x, Experiment.physics.vectors[j].y);
             }
             ctx.stroke();
-
-            /*var arrows = new Path2D();
-
-            */
         }
     }
 };
 
 function canvas_arrow(context, fromx, fromy, tox, toy) {
-    var headlen = 5;   // length of head in pixels
+    var headlen = 3;   // length of head in pixels
     var angle = Math.atan2(toy - fromy, tox - fromx);
     context.moveTo(fromx, fromy);
     context.lineTo(tox, toy);
@@ -357,7 +353,7 @@ function solveSqrEquation(a, b, c) { // ax^2 + bx + c = 0
 };*/
 
 $(document).ready(function () {
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 20; i++) {
         Experiment.physics.vectors[i] = {
             x: Math.random() * 100 - 50,
             y: Math.random() * 100 - 50
