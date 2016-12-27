@@ -1,70 +1,75 @@
 /**
  * Created by Влад on 25.12.2016.
  */
-function create_vector(perpendicular_amplitude, perpendicular_func, parallel_amplitude, parallel_func) {
+function create_vector(x, y) {
     return {
-        perpendicular_amplitude: perpendicular_amplitude,
-        perpendicular_func: perpendicular_func,
-        parallel_amplitude: parallel_amplitude,
-        parallel_func: parallel_func,
-        get_state: function (time) {
-            return{
-                x: perpendicular_amplitude * parallel_func(time),
-                y: parallel_amplitude * parallel_func(time)
-            }
-        }
+        x: x,
+        y: y
     }
+
 }
 
-function create_options(alpha, betta, n1, n2) {
+function create_options(alpha, beta, n1, n2) {
     return {
         alpha: alpha,
-        betta: betta,
+        beta: beta,
         n1: n1,
         n2: n2
     }
 }
 
 function reflected_perpendicular_amplitude(options) {
-    return (options.n1 * Math.cos(options.alpha) - options.n2 * Math.cos(options.betta)) / (options.n1 * Math.cos(options.alpha) + options.n2 * Math.cos(options.betta));
+    return (options.n1 * Math.cos(options.alpha) - options.n2 * Math.cos(options.beta)) / (options.n1 * Math.cos(options.alpha) + options.n2 * Math.cos(options.beta));
 }
 
 function reflected_parallel_amplitude(options) {
-    return (options.n2 * Math.cos(options.alpha) - options.n1 * Math.cos(options.betta)) / (options.n2 * Math.cos(options.alpha) + options.n1 * Math.cos(options.betta));
+    return (options.n2 * Math.cos(options.alpha) - options.n1 * Math.cos(options.beta)) / (options.n2 * Math.cos(options.alpha) + options.n1 * Math.cos(options.beta));
 }
 
 function refracted_perpendicular_amplitude(options) {
-    return (2 * options.n1 * Math.cos(options.alpha)) / (options.n2 * Math.cos(options.betta) + options.n1 * Math.cos(options.alpha))
+    return (2 * options.n1 * Math.cos(options.alpha)) / (options.n2 * Math.cos(options.beta) + options.n1 * Math.cos(options.alpha))
 }
 
 function refracted_parallel_amplitude(options) {
-    return (2 * options.n1 * Math.cos(options.alpha)) / (options.n2 * Math.cos(options.alpha) + options.n1 * Math.cos(options.betta))
+    return (2 * options.n1 * Math.cos(options.alpha)) / (options.n2 * Math.cos(options.alpha) + options.n1 * Math.cos(options.beta))
 }
 
 function get_reflected_vector(vector, options) {
-    return create_vector(reflected_perpendicular_amplitude(options) * vector.perpendicular_amplitude,
-        vector.perpendicular_func,
-        reflected_parallel_amplitude(options) * vector.parallel_amplitude,
-        vector.parallel_func);
+    return create_vector(reflected_perpendicular_amplitude(options) * vector.x,
+        reflected_parallel_amplitude(options) * vector.y);
 }
 
 function get_refracted_vector(vector, options) {
-    return create_vector(refracted_perpendicular_amplitude(options) * vector.perpendicular_amplitude,
-        vector.perpendicular_func,
-        refracted_parallel_amplitude(options) * vector.parallel_amplitude,
-        vector.parallel_func);
+    return create_vector(refracted_perpendicular_amplitude(options) * vector.x,
+        refracted_parallel_amplitude(options) * vector.y);
 }
 
 function generate_unpolarized_waves(amplitude) {
     var result = [];
     for (var i = 0; i < 20; ++i) {
         var angle = Math.random() * 2 * Math.PI;
-        var perpendicular_amplitude = amplitude * Math.cos(angle);
-        var parallel_amplitude = amplitude * Math.sin(angle);
-        var vector_function = function (time) {
-            return Math.cos(time / 1500)
-        };
-        result.push(create_vector(perpendicular_amplitude, vector_function, parallel_amplitude, vector_function))
+        var x = amplitude * Math.cos(angle);
+        var y = amplitude * Math.sin(angle);
+        result.push(create_vector(x, y))
     }
     return result;
+}
+
+function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplitude) {
+    var result_array = [];
+    result_array[0] = generate_unpolarized_waves(amplitude);
+    result_array[1] = [];
+    result_array[2] = [];
+    result_array[3] = [];
+    var first_options = create_options(alpha1, beta1, n1, n2);
+    var i;
+    for (i = 0; i < result_array[0].length; ++i) {
+        result_array[1].push(get_reflected_vector(first_array[i], first_options));
+        result_array[2].push(get_refracted_vector(first_array[i], first_options))
+    }
+    var second_options = create_options(alpha2, beta2, n2, n1);
+    for (i = 0; i < result_array[2].length; ++i) {
+        result_array[3].push(get_refracted_vector(third_array[i], second_options));
+    }
+    return result_array;
 }
