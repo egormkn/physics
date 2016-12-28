@@ -73,7 +73,7 @@ function generate_arrays_of_vectors(physics) {
     var polarization = physics.polarization;
     var angle = physics.angle;
     var intent = physics.i;
-    var amplitude = Math.sqrt(2 * i / Math.sqrt((physics.epsilon1 * 8.85418781762039 * Math.pow(10, -5)) / (physics.nu1 * 4 * Math.PI)));
+    var amplitude = Math.sqrt(2 * intent / Math.sqrt((physics.epsilon1 * 8.85418781762039 * Math.pow(10, -5)) / (physics.nu1 * 4 * Math.PI)));
     angle = angle * Math.PI / 180;
     var result_array = [];
     if (polarization) {
