@@ -62,10 +62,10 @@ var Experiment = {
             var physics = Experiment.physics;
             Experiment.physics.vectors = generate_arrays_of_vectors(physics);
             Experiment.physics.intensity = get_intensity(Experiment.physics);
-            Experiment.i1Text.innerHTML = Experiment.physics.intensity[0];
-            Experiment.i2Text.innerHTML = Experiment.physics.intensity[1];
-            Experiment.i3Text.innerHTML = Experiment.physics.intensity[2];
-            Experiment.i4Text.innerHTML = Experiment.physics.intensity[3];
+            Experiment.i1Text.innerHTML = Experiment.physics.intensity[0].toFixed(5);
+            Experiment.i2Text.innerHTML = Experiment.physics.intensity[1].toFixed(5);
+            Experiment.i3Text.innerHTML = Experiment.physics.intensity[2].toFixed(5);
+            Experiment.i4Text.innerHTML = Experiment.physics.intensity[3].toFixed(5);
             Experiment.drawGraphics();
         }, 100);
     },
