@@ -63,7 +63,17 @@ function generate_unpolarized_waves(amplitude) {
     return result;
 }
 
-function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplitude, polarization, angle) {
+function generate_arrays_of_vectors(physics) {
+    var alpha1 = physics.alpha1;
+    var alpha2 = physics.alpha2;
+    var beta1 = physics.beta1;
+    var beta2 = physics.beta2;
+    var n1 = physics.n1;
+    var n2 = physics.n2;
+    var polarization = physics.polarization;
+    var angle = physics.angle;
+    var intent = physics.i;
+    var amplitude = Math.sqrt(2 * i / Math.sqrt((physics.epsilon1 * 8.85418781762039 * Math.pow(10, -5)) / (physics.nu1 * 4 * Math.PI)));
     angle = angle * Math.PI / 180;
     var result_array = [];
     if (polarization) {
@@ -107,8 +117,8 @@ function intensity_of_vector(vector, epsilon, nu) {
 }
 
 function get_intensity(physics) {
-    return [intensity_of_vector(physics.vectors[0][0], physics.epsilon1, physics.nu1),
-        intensity_of_vector(physics.vectors[1][0], physics.epsilon1, physics.nu1),
-        intensity_of_vector(physics.vectors[2][0], physics.epsilon2, physics.nu2),
-        intensity_of_vector(physics.vectors[3][0], physics.epsilon1, physics.nu1)];
+    return [intensity_of_vector(physics.vectors[0], physics.epsilon1, physics.nu1),
+        intensity_of_vector(physics.vectors[1], physics.epsilon1, physics.nu1),
+        intensity_of_vector(physics.vectors[2], physics.epsilon2, physics.nu2),
+        intensity_of_vector(physics.vectors[3], physics.epsilon1, physics.nu1)];
 }
