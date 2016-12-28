@@ -38,7 +38,7 @@ var Experiment = {
             y: 10
         },
         n1: 1,
-        n2: 1.33,
+        n2: 1.5,
         i: 1,
         lensRadius: 50,
         delta: -0.5,
@@ -49,6 +49,10 @@ var Experiment = {
         amplitude: 50,
         polarization: false,
         angle: 0,
+        epsilon1: 1.00058986,
+        nu1: 1.000038,
+        epsilon2: 4.7,
+        nu2: 0.999987,
         vectors: [],
         intensity: []
     },
