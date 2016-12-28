@@ -17,7 +17,7 @@ var Experiment = {
     n1Field: document.getElementById('input_n1'),
     n2Field: document.getElementById('input_n2'),
     iField: document.getElementById('input_i'),
-    aField: document.getElementById('input_a'),
+    //aField: document.getElementById('input_a'),
     angleField: document.getElementById('input_angle'),
     alpha1Text: document.getElementById('alpha1'),
     beta1Text: document.getElementById('beta1'),
@@ -60,7 +60,7 @@ var Experiment = {
         clearInterval(Experiment.interval);
         Experiment.interval = setInterval(function () {
             var physics = Experiment.physics;
-            Experiment.physics.vectors = generate_arrays_of_vectors(physics.alpha1, physics.beta1, physics.alpha2, physics.beta2, physics.n1, physics.n2, physics.amplitude, physics.polarization, physics.angle);
+            Experiment.physics.vectors = generate_arrays_of_vectors(physics);
             Experiment.physics.intensity = get_intensity(Experiment.physics);
             Experiment.i1Text.innerHTML = Experiment.physics.intensity[0];
             Experiment.i2Text.innerHTML = Experiment.physics.intensity[1];
@@ -390,7 +390,7 @@ $(document).ready(function () {
     Experiment.physics.n1 = $(Experiment.n1Field).val();
     Experiment.physics.n2 = $(Experiment.n2Field).val();
     Experiment.physics.i = $(Experiment.iField).val();
-    Experiment.physics.amplitude = $(Experiment.aField).val();
+    //Experiment.physics.amplitude = $(Experiment.aField).val();
     Experiment.physics.polarization = $('.input_type:checked').val() == "1";
     $(Experiment.angleField).prop('disabled', !Experiment.physics.polarization);
     Experiment.setWidth("auto");
@@ -439,11 +439,11 @@ $(Experiment.iField).on('input', function (e) {
     Experiment.draw();
 });
 
-$(Experiment.aField).on('input', function (e) {
+/*$(Experiment.aField).on('input', function (e) {
     var value = $(this).val();
     Experiment.physics.amplitude = parseFloat(value);
     Experiment.draw();
-});
+});*/
 
 $('input:radio[name="input_type"]').change(function () {
     if ($(this).is(':checked')) {

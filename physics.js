@@ -95,20 +95,20 @@ function generate_arrays_of_vectors(alpha1, beta1, alpha2, beta2, n1, n2, amplit
 }
 
 function intensity_of_vector(vector, epsilon, nu) {
-    var amp;
+    var amp = 0;
     var len;
     for (var i = 0; i < vector.length; ++i) {
         len = vector[i].x * vector[i].x + vector[i].y * vector[i].y;
-        amp += len;
+        amp += Math.sqrt(len);
     }
+    console.log(amp);
     amp = amp / vector.length;
-
     return amp * amp * Math.sqrt((epsilon * 8.85418781762039 * Math.pow(10, -5)) / (nu * 4 * Math.PI)) / 2;
 }
 
 function get_intensity(physics) {
-    return [intensity_of_vector(physics.vectors[0][0], physics.epsilon1, physics.nu1),
-        intensity_of_vector(physics.vectors[1][0], physics.epsilon1, physics.nu1),
-        intensity_of_vector(physics.vectors[2][0], physics.epsilon2, physics.nu2),
-        intensity_of_vector(physics.vectors[3][0], physics.epsilon1, physics.nu1)];
+    return [intensity_of_vector(physics.vectors[0], physics.epsilon1, physics.nu1),
+        intensity_of_vector(physics.vectors[1], physics.epsilon1, physics.nu1),
+        intensity_of_vector(physics.vectors[2], physics.epsilon2, physics.nu2),
+        intensity_of_vector(physics.vectors[3], physics.epsilon1, physics.nu1)];
 }
